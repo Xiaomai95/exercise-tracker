@@ -55,7 +55,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => { //:_id refers to use
 
   let exDescription = req.body.description;
   let exDuration = req.body.duration;
-  let exDate = req.body.date;
+  let exDate = new Date(req.body.date).toDateString();
   let id = req.body[':_id']
   let findUser = await newUser.findById(id).exec()
 
@@ -67,7 +67,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => { //:_id refers to use
       return res.json(result)
     } 
     else {
-      let exercise = new newExercise({username: findUser.username, description: exDescription, duration: exDuration, date: exDate.toDateString()})
+      let exercise = new newExercise({username: findUser.username, description: exDescription, duration: exDuration, date: exDate})
       const result = await exercise.save()
       return res.json(result)
     }
