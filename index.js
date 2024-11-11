@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+const mongoose = require('mongoose')
 require('dotenv').config()
 
 app.use(cors())
@@ -9,7 +10,11 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+mongoose.connect(process.env.MONGO_URI)
 
+mongoose.connection.on('connected', () => {
+  console.log('connected')
+})
 
 
 
