@@ -51,11 +51,10 @@ const exercise = new mongoose.Schema({
 const newExercise = mongoose.model('exercises', exercise)
 
 app.post('/api/users/:_id/exercises', async (req, res) => { //:_id refers to user id
-  console.log(req.body)
 
   let exDescription = req.body.description;
   let exDuration = req.body.duration;
-  let exDate = new Date(req.body.date).toDateString();
+  let exDate = new Date(req.body.date).toDateString(); //format yyyy-mm-dd with toDateString()
   let id = req.body[':_id']
   let findUser = await newUser.findById(id).exec()
 
@@ -89,13 +88,20 @@ app.post('/api/users/:_id/exercises', async (req, res) => { //:_id refers to use
 //   }]
 // }
 
+//find exercise logs with username/id and add them individually as objects to log.log
+//count how many exercise logs belonging to user there are
 
 
-
-
-//Create model based on Schema
-
-
+app.get('/api/users', async (req, res) => {
+  try {
+    let findAllUsers = await newUser.find({})
+    .then((result) => {
+    return res.json(result)
+  })
+  } catch(e) {
+    return res.json({error: 'Error returning all users'})
+  }
+})
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
