@@ -21,18 +21,28 @@ mongoose.connection.on('connected', () => {
 
 //Create Schemas
 
-///User:
-const user = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   username: String
 })
 
-const newUser = mongoose.model('users', user) //see 'users' in MongoDB
+//Exercise:
+const exerciseSchema = new mongoose.Schema({
+  username: String,
+  description: String,
+  duration: Number,
+  date: String,
+  userId: String,
+})
+
+//Models:
+const User = mongoose.model('users', userSchema) //see 'users' in MongoDB
+const Exercise = mongoose.model('exercises', exerciseSchema)
 
 app.post('/api/users', async (req, res) => {
 
   try {
     let newUsername = req.body.username
-    let createNewUser = new newUser({username: newUsername})
+    let createNewUser = new User({username: newUsername})
     const result = await createNewUser.save()
     return res.json(result)
   } catch(e) {
@@ -40,39 +50,44 @@ app.post('/api/users', async (req, res) => {
   }
 })
 
-//Exercise:
-const exercise = new mongoose.Schema({
-  username: String,
-  description: String,
-  duration: Number,
-  date: String,
-})
 
-const newExercise = mongoose.model('exercises', exercise)
+
 
 app.post('/api/users/:_id/exercises', async (req, res) => { //:_id refers to user id
-
+  
   let exDescription = req.body.description;
   let exDuration = req.body.duration;
-  let exDate = new Date(req.body.date).toDateString(); //format yyyy-mm-dd with toDateString()
-  let id = req.body[':_id']
-  let findUser = await newUser.findById(id).exec()
+  let exDate = req.body.date ? new Date(req.body.date).toDateString() : new Date().toDateString(); //format yyyy-mm-dd with toDateString()
+  let id = req.params._id;
 
-  try {
-    if (!req.body.date) {
-      let currentDate = new Date().toDateString(); //today's date in format: Mon Jan 01 1990
-      let exercise = new newExercise({username: findUser.username, description: exDescription, duration: exDuration, date: currentDate})
-      const result = await exercise.save() 
-      return res.json(result)
-    } 
-    else {
-      let exercise = new newExercise({username: findUser.username, description: exDescription, duration: exDuration, date: exDate})
-      const result = await exercise.save()
-      return res.json(result)
+
+  let findUser = await User.findById(id); //add if statement in case user not found
+
+  if (findUser) { //Check if User does exist
+    let createExercise = new Exercise ({
+      username: findUser.username, 
+      description: exDescription,
+       duration: exDuration,
+       date: exDate,
+    })
+    try {
+        let result = await createExercise.save() 
+        return res.json({
+          username: findUser.username,
+          description: exDescription,
+          duration: parseInt(exDuration),
+          date: exDate,
+          _id: findUser._id // Respond with the user's ID
+        })
+      
+    } catch (e) {
+      return res.json({error: 'Could not add new exercise'})
     }
-  } catch (e) {
-    return res.json({error: 'Could not add new exercise'})
+  } else {
+    res.json({error: "User not found. Try enter a different ID."})
   }
+
+  
 
 })
 
@@ -94,7 +109,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => { //:_id refers to use
 
 app.get('/api/users', async (req, res) => {
   try {
-    let findAllUsers = await newUser.find({})
+    let findAllUsers = await User.find({})
     .then((result) => {
     return res.json(result)
   })
