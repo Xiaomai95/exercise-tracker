@@ -51,9 +51,6 @@ app.post('/api/users', async (req, res) => {
   }
 })
 
-
-
-
 app.post('/api/users/:_id/exercises', async (req, res) => { //:_id refers to user id
   
   let exDescription = req.body.description;
@@ -97,13 +94,11 @@ app.get('/api/users/:_id/logs', async (req, res) => {
   let limitQuery = req.query.limit ? Number(req.query.limit) : 0; //If no limit given, defaults to 0.
 
   let findUser = await User.findById(id).exec();
-  console.log(to)
   
   if(findUser) {
     try {
       let id = findUser.id;
       let usernameFound = findUser.username;
-      console.log("id", id)
       let exercises = await Exercise.find(
       {
         username: usernameFound,
@@ -115,11 +110,11 @@ app.get('/api/users/:_id/logs', async (req, res) => {
        .select('description duration date')
        .limit(limitQuery)
        .exec();
-       console.log("exercises", exercises)
+       
        let parsedDatesLog = exercises.map(exercise => {
         return {
           description: exercise.description,
-          duration: exercise.duration * 1,
+          duration: exercise.duration * 1, //* 1 converts string to number
           date: new Date(exercise.date).toDateString(),
         };
       });
@@ -137,24 +132,8 @@ app.get('/api/users/:_id/logs', async (req, res) => {
   } else {
     return res.json({error: 'No user found'})
   }
-
-
 })
 
-///Log response:
-// {
-//   username: "fcc_test",
-//   count: 1,
-//   _id: "5fb5853f734231456ccb3b05",
-//   log: [{
-//     description: "test",
-//     duration: 60,
-//     date: "Mon Jan 01 1990",
-//   }]
-// }
-
-//find exercise logs with username/id and add them individually as objects to log.log
-//count how many exercise logs belonging to user there are
 
 
 app.get('/api/users', async (req, res) => {
