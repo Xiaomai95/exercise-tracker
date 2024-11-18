@@ -11,3 +11,7 @@ A simple Exercise Tracker microservice that can create new users, add logs of th
 
 ## Example Output
 
+GET api/users/:id/logs returns:
+```
+{"_id":"673b6c574ae08555f6235a96","username":"etho","count":3,"log":[{"description":"scdcsd","duration":5,"date":"Fri Nov 23 2012"},{"description":"scdcsdt","duration":5,"date":"Sat Nov 24 2012"},{"description":"scdcsdte","duration":5,"date":"Sun Nov 25 2012"}]}
+```
