@@ -97,15 +97,15 @@ app.get('/api/users/:_id/logs', async (req, res) => {
   
   if(findUser) {
     try {
-      let id = findUser.id;
+      let id = findUser._id;
       let usernameFound = findUser.username;
       let exercises = await Exercise.find(
       {
         username: usernameFound,
-        date: {
-        $gte: from,
-        $lte: to
-      }
+      //   date: {
+      //   $gte: from,
+      //   $lte: to
+      // }
        })
        .select('description duration date')
        .limit(limitQuery)
